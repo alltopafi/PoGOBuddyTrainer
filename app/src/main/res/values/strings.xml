@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">PokéBuddy Trainer</string>
+    <string name="title_main">Pokémon Buddy Guide</string>
+    <string name="btn_start">Start Training Session</string>
+    <string name="btn_abort">Abort Session</string>
+    <string name="btn_grant_permission">Grant Notification Permission</string>
+    <string name="status_label">Current State:</string>
+    <string name="step_label">Current Step:</string>
+    <string name="time_label">Time Remaining:</string>
+    <string name="perm_desc">This app requires notification permissions to display the training task list and timer progress bars in your notification shade.</string>
+</resources>
