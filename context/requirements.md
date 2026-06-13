@@ -51,7 +51,7 @@ Step 5:
 Step 6:
   message:
     Next Step 2 berries 🍓
-    {{progress bar that elapsed minutes /15m}}
+    {{progress bar that elapsed minutes /30m}}
   criticalText:
     number of minutes remaining
   1. Wait 30 minutes
@@ -68,7 +68,7 @@ Step 7:
 Step 8:
   message:
     Next Step: 1 berry 🍓
-    {{progress bar that elapsed minutes /15m}}
+    {{progress bar that elapsed minutes /30m}}
   criticalText:
     number of minutes remaining
   1. Wait 30 minutes
