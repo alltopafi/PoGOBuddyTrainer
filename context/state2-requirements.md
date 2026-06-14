@@ -1,0 +1,1 @@
+When moving to aa new task I want the phone to vibrate, do some research to see how how to do this and return a plan in to accomplish this with live notifications. 
