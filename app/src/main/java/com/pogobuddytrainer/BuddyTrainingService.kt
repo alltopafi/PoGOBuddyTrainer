@@ -12,6 +12,9 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 
@@ -95,6 +98,7 @@ class BuddyTrainingService : Service() {
         }
 
         startTaskTimeout()
+        vibrateAndAlert(steps[0])
         sendStateBroadcast()
     }
 
@@ -116,6 +120,7 @@ class BuddyTrainingService : Service() {
                 StepType.TASK -> {
                     currentState = "TASK"
                     startTaskTimeout()
+                    vibrateAndAlert(nextStep)
                 }
                 StepType.TIMER -> {
                     currentState = "TIMER"
@@ -130,6 +135,37 @@ class BuddyTrainingService : Service() {
             sendStateBroadcast()
         } else {
             completeRoutine()
+        }
+    }
+
+    private fun vibrateAndAlert(step: Step) {
+        // 1. Post high-priority alert notification (triggers channel vibration)
+        val alertNotification = NotificationCompat.Builder(this, ALERT_CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle("⚠️ New Task Ready!")
+            .setContentText(step.message.lines().firstOrNull() ?: "")
+            .setStyle(NotificationCompat.BigTextStyle().bigText(step.message))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .build()
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(ALERT_NOTIFICATION_ID, alertNotification)
+
+        // 2. Vibrate directly
+        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vm = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            vm.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 300, 150, 300), -1))
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator.vibrate(longArrayOf(0, 300, 150, 300), -1)
         }
     }
 
@@ -230,6 +266,7 @@ class BuddyTrainingService : Service() {
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle("Pokemon Buddy Trainer")
             .setOngoing(true)
+            .setOnlyAlertOnce(true)
 
         // Intent to open MainActivity on click
         val openIntent = Intent(this, MainActivity::class.java).apply {
@@ -290,12 +327,24 @@ class BuddyTrainingService : Service() {
             val serviceChannel = NotificationChannel(
                 CHANNEL_ID,
                 "Pokemon Buddy Trainer Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_LOW
             ).apply {
                 description = "Foreground channel for Pokémon Buddy excitement scheduling"
+                enableVibration(false)
+                vibrationPattern = null
+            }
+            val alertChannel = NotificationChannel(
+                ALERT_CHANNEL_ID,
+                "Buddy Task Alerts",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Vibrates when a new Pokémon Buddy task is ready"
+                enableVibration(true)
+                vibrationPattern = longArrayOf(0, 300, 150, 300)
             }
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(serviceChannel)
+            manager.createNotificationChannel(alertChannel)
         }
     }
 
@@ -322,6 +371,8 @@ class BuddyTrainingService : Service() {
     companion object {
         const val NOTIFICATION_ID = 1001
         const val CHANNEL_ID = "buddy_trainer_channel"
+        const val ALERT_CHANNEL_ID = "buddy_alert_channel"
+        const val ALERT_NOTIFICATION_ID = 2001
 
         // Actions
         const val ACTION_START = "com.pogobuddytrainer.ACTION_START"
