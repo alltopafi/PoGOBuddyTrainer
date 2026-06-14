@@ -268,6 +268,8 @@ class BuddyTrainingService : Service() {
             .setOngoing(true)
             .setOnlyAlertOnce(true)
 
+        builder.extras.putBoolean("android.requestPromotedOngoing", true)
+
         // Intent to open MainActivity on click
         val openIntent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
