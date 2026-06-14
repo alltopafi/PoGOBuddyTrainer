@@ -1,4 +1,4 @@
-There is a bug in the style/presentation of the notification in stage3-screenshots thera are screenshots that show the difference between a similar notification working with home assistant, I believe another product of this issue is no icon with text with the remaining number of minutes or hint on what the state of the flow is ie. Task! Aborted! Completed! etc
+There is a bug in the notification it does not appear to be a live notification, in the notification bar you cannot click the icon to view it like I can in other similar live notifications.
 
 Here some reasearch with with instuctions on craeteing a live notifications. 
 
